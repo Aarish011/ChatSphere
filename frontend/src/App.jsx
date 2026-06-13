@@ -5,6 +5,7 @@ import ProfilePage from './pages/ProfilePage';
 import LoginPage from './pages/LoginPage';
 import ChatLayout from './components/ChatLayout';
 import { Toaster } from 'react-hot-toast';
+import bgImage from './assets/bgImage.svg';
 import { useAuth } from './context/AuthContext';
 
 const App = () => {
@@ -12,7 +13,10 @@ const App = () => {
   const token = localStorage.getItem('token');
 
   return (
-    <div className="bg-[url('./src/assets/bgImage.svg')] bg-contain min-h-screen">
+    <div
+      className='bg-cover bg-center min-h-screen'
+      style={{ backgroundImage: `url(${bgImage})` }}
+    >
       <Toaster position='top-right' />
       <Routes>
         {/* Public Routes */}
