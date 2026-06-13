@@ -16,6 +16,9 @@ app.use(
     credentials: true,
   })
 );
+app.get('/', (req, res) => {
+  res.send('Backend Running');
+});
 
 app.use('/api/user/', userRouter);
 app.use('/api/message', messageRouter);
