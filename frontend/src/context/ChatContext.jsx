@@ -10,6 +10,30 @@ import axiosInstance from '../lib/axios';
 import toast from 'react-hot-toast';
 import { useAuth } from './AuthContext';
 
+// ✅ Create audio instance (outside component to avoid recreation)
+let audio = null;
+
+const playNotificationSound = () => {
+  try {
+    if (!audio) {
+      audio = new Audio('/sounds/message.mp3'); // Path to your sound file
+      audio.preload = 'auto';
+    }
+    // Reset audio to start if already playing
+    audio.currentTime = 0;
+    // Play with proper handling for autoplay policies
+    const playPromise = audio.play();
+    if (playPromise !== undefined) {
+      playPromise.catch((error) => {
+        // Autoplay was prevented - user interaction required
+        console.log('Audio play prevented:', error);
+      });
+    }
+  } catch (error) {
+    console.error('Error playing notification sound:', error);
+  }
+};
+
 const ChatContext = createContext();
 
 export const ChatProvider = ({ children }) => {
@@ -21,7 +45,17 @@ export const ChatProvider = ({ children }) => {
   const [isTyping, setIsTyping] = useState(false);
   const [typingTimeout, setTypingTimeout] = useState(null);
   const [unreadCounts, setUnreadCounts] = useState({});
+  // ✅ Sound toggle state (persisted in localStorage)
+  const [soundEnabled, setSoundEnabled] = useState(() => {
+    const saved = localStorage.getItem('soundEnabled');
+    return saved !== null ? JSON.parse(saved) : true;
+  });
   const { authUser } = useAuth();
+
+  // ✅ Save sound preference to localStorage
+  useEffect(() => {
+    localStorage.setItem('soundEnabled', JSON.stringify(soundEnabled));
+  }, [soundEnabled]);
 
   // ✅ FIX: Use ref to avoid stale selectedUser in socket listeners
   const selectedUserRef = useRef(null);
@@ -95,6 +129,11 @@ export const ChatProvider = ({ children }) => {
       // ✅ FIX: Get senderId properly (handle populated vs string)
       const senderId = newMessage.senderId?._id || newMessage.senderId;
 
+      // ✅ Play sound for incoming messages (not from current user)
+      if (senderId !== authUser?._id && soundEnabled) {
+        playNotificationSound();
+      }
+
       // Update messages if chat is open with sender
       if (selectedUserRef.current && senderId === selectedUserRef.current._id) {
         setMessages((prev) => [...prev, newMessage]);
@@ -116,7 +155,7 @@ export const ChatProvider = ({ children }) => {
     return () => {
       socket.off('newMessage', handleNewMessage);
     };
-  }, [socket]);
+  }, [socket, authUser, soundEnabled]);
 
   // Listen for message delivered status
   useEffect(() => {
@@ -339,6 +378,9 @@ export const ChatProvider = ({ children }) => {
     handleTyping,
     unreadCounts,
     fetchUnreadCounts,
+    // ✅ Sound related values
+    soundEnabled,
+    setSoundEnabled,
   };
 
   return <ChatContext.Provider value={value}>{children}</ChatContext.Provider>;
