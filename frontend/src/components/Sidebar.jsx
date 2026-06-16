@@ -154,27 +154,27 @@ const Sidebar = () => {
   };
 
   return (
-    <div className='w-1/4 min-w-[260px] h-full bg-white/10 backdrop-blur-md border-r border-white/10 text-white flex flex-col'>
-      {/* HEADER */}
-      <div className='p-4 flex items-center justify-between border-b border-white/10 relative'>
-        <h2 className='font-bold text-lg'>Chats</h2>
+    <div className='w-full md:w-1/4 min-w-[200px] md:min-w-[260px] h-full bg-white/10 backdrop-blur-md border-r border-white/10 text-white flex flex-col'>
+      {/* HEADER - Mobile Optimized */}
+      <div className='p-3 sm:p-4 flex items-center justify-between border-b border-white/10 relative'>
+        <h2 className='font-bold text-base sm:text-lg'>Chats</h2>
         <img
           src={assets.menu_icon}
-          className='w-5 cursor-pointer'
+          className='w-4 sm:w-5 cursor-pointer'
           onClick={() => setMenuOpen(!menuOpen)}
           alt='menu'
         />
         {menuOpen && (
-          <div className='absolute right-3 top-12 w-44 bg-white text-black rounded-lg shadow-lg overflow-hidden z-50'>
+          <div className='absolute right-2 sm:right-3 top-10 sm:top-12 w-40 sm:w-44 bg-white text-black rounded-lg shadow-lg overflow-hidden z-50'>
             <button
               onClick={handleEditProfile}
-              className='w-full text-left px-4 py-2 hover:bg-gray-100 text-sm'
+              className='w-full text-left px-3 sm:px-4 py-1.5 sm:py-2 hover:bg-gray-100 text-xs sm:text-sm'
             >
               Edit Profile
             </button>
             <button
               onClick={handleLogout}
-              className='w-full text-left px-4 py-2 hover:bg-gray-100 text-sm text-red-500'
+              className='w-full text-left px-3 sm:px-4 py-1.5 sm:py-2 hover:bg-gray-100 text-xs sm:text-sm text-red-500'
             >
               Logout
             </button>
@@ -182,36 +182,38 @@ const Sidebar = () => {
         )}
       </div>
 
-      {/* SEARCH */}
-      <div className='p-3'>
+      {/* SEARCH - Mobile Optimized */}
+      <div className='p-2 sm:p-3'>
         <div className='relative'>
           <input
             value={search}
             onChange={handleSearchChange}
             placeholder='Search users...'
-            className='w-full px-3 py-2 bg-white/10 rounded-lg outline-none text-sm'
+            className='w-full px-2.5 sm:px-3 py-1.5 sm:py-2 bg-white/10 rounded-lg outline-none text-xs sm:text-sm'
           />
           {loading && (
-            <div className='absolute right-3 top-2.5'>
-              <div className='w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin'></div>
+            <div className='absolute right-2 sm:right-3 top-2 sm:top-2.5'>
+              <div className='w-3 h-3 sm:w-4 sm:h-4 border-2 border-white/30 border-t-white rounded-full animate-spin'></div>
             </div>
           )}
         </div>
       </div>
 
-      {/* RECENT SEARCHES SECTION */}
+      {/* RECENT SEARCHES SECTION - Mobile Optimized */}
       {showRecent && recentUsers.length > 0 && !search && (
-        <div className='px-3 pb-2'>
-          <div className='flex items-center justify-between mb-2'>
-            <p className='text-xs text-gray-400'>Recent Searches</p>
+        <div className='px-2 sm:px-3 pb-2'>
+          <div className='flex items-center justify-between mb-1.5 sm:mb-2'>
+            <p className='text-[10px] sm:text-xs text-gray-400'>
+              Recent Searches
+            </p>
             <button
               onClick={clearHistory}
-              className='text-xs text-red-400 hover:text-red-300 transition'
+              className='text-[10px] sm:text-xs text-red-400 hover:text-red-300 transition'
             >
               Clear All
             </button>
           </div>
-          <div className='space-y-1'>
+          <div className='space-y-0.5 sm:space-y-1'>
             {recentUsers.map((user) => {
               const isOnline = onlineUsers.includes(user._id);
               const unreadCount = unreadCounts[user._id] || 0;
@@ -220,30 +222,32 @@ const Sidebar = () => {
                 <div
                   key={user._id}
                   onClick={() => handleUserClick(user)}
-                  className={`flex items-center gap-3 p-2 cursor-pointer hover:bg-white/10 rounded-lg transition
+                  className={`flex items-center gap-2 sm:gap-3 p-1.5 sm:p-2 cursor-pointer hover:bg-white/10 rounded-lg transition
                     ${selectedUser?._id === user._id ? 'bg-white/10' : ''}
                   `}
                 >
                   <div className='relative flex-shrink-0'>
                     <img
                       src={user.profilePic}
-                      className='w-8 h-8 rounded-full object-cover'
+                      className='w-7 h-7 sm:w-8 sm:h-8 rounded-full object-cover'
                       alt={user.fullName}
                     />
                     {isOnline && (
-                      <span className='absolute bottom-0 right-0 w-2 h-2 bg-green-500 border border-black rounded-full'></span>
+                      <span className='absolute bottom-0 right-0 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-green-500 border border-black rounded-full'></span>
                     )}
                   </div>
                   <div className='flex-1 min-w-0'>
-                    <p className='text-sm font-medium truncate'>
+                    <p className='text-xs sm:text-sm font-medium truncate'>
                       {user.fullName}
                     </p>
-                    <p className='text-xs text-gray-400'>Recent search</p>
+                    <p className='text-[8px] sm:text-xs text-gray-400'>
+                      Recent search
+                    </p>
                   </div>
                   {/* Unread Badge for Recent Searches */}
                   {unreadCount > 0 && (
                     <div className='flex-shrink-0'>
-                      <span className='bg-green-500 text-white text-xs font-bold px-2 py-0.5 rounded-full min-w-[20px] h-5 flex items-center justify-center'>
+                      <span className='bg-green-500 text-white text-[8px] sm:text-xs font-bold px-1.5 sm:px-2 py-0.5 rounded-full min-w-[16px] sm:min-w-[20px] h-4 sm:h-5 flex items-center justify-center'>
                         {unreadCount}
                       </span>
                     </div>
@@ -255,10 +259,10 @@ const Sidebar = () => {
         </div>
       )}
 
-      {/* SEARCH RESULTS */}
+      {/* SEARCH RESULTS - Mobile Optimized */}
       <div className='flex-1 overflow-y-auto'>
         {!showRecent && users.length === 0 && !loading && search && (
-          <div className='text-center text-gray-400 mt-6 text-sm'>
+          <div className='text-center text-gray-400 mt-4 sm:mt-6 text-xs sm:text-sm'>
             No users found
           </div>
         )}
@@ -271,7 +275,7 @@ const Sidebar = () => {
             <div
               key={user._id}
               onClick={() => handleUserClick(user)}
-              className={`flex items-center gap-3 p-3 cursor-pointer hover:bg-white/10 transition
+              className={`flex items-center gap-2 sm:gap-3 p-2 sm:p-3 cursor-pointer hover:bg-white/10 transition
                 ${selectedUser?._id === user._id ? 'bg-white/10' : ''}
               `}
             >
@@ -279,18 +283,20 @@ const Sidebar = () => {
               <div className='relative flex-shrink-0'>
                 <img
                   src={user.profilePic}
-                  className='w-11 h-11 rounded-full object-cover'
+                  className='w-9 h-9 sm:w-11 sm:h-11 rounded-full object-cover'
                   alt={user.fullName}
                 />
                 {isOnline && (
-                  <span className='absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-black rounded-full'></span>
+                  <span className='absolute bottom-0 right-0 w-2.5 h-2.5 sm:w-3 sm:h-3 bg-green-500 border-2 border-black rounded-full'></span>
                 )}
               </div>
 
               {/* NAME */}
               <div className='flex-1 min-w-0'>
-                <p className='text-sm font-medium truncate'>{user.fullName}</p>
-                <p className='text-xs text-gray-300'>
+                <p className='text-xs sm:text-sm font-medium truncate'>
+                  {user.fullName}
+                </p>
+                <p className='text-[8px] sm:text-xs text-gray-300'>
                   {isOnline ? 'Online' : 'Offline'}
                 </p>
               </div>
@@ -298,7 +304,7 @@ const Sidebar = () => {
               {/* UNREAD COUNT BADGE */}
               {unreadCount > 0 && (
                 <div className='flex-shrink-0'>
-                  <span className='bg-green-500 text-white text-xs font-bold px-2 py-0.5 rounded-full min-w-[20px] h-5 flex items-center justify-center'>
+                  <span className='bg-green-500 text-white text-[8px] sm:text-xs font-bold px-1.5 sm:px-2 py-0.5 rounded-full min-w-[16px] sm:min-w-[20px] h-4 sm:h-5 flex items-center justify-center'>
                     {unreadCount}
                   </span>
                 </div>
