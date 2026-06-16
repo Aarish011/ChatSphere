@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import assets from '../assets/assets';
 import { useAuth } from '../context/AuthContext';
-
-
+import toast from 'react-hot-toast';
 
 const LoginPage = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -14,26 +13,33 @@ const LoginPage = () => {
     confirmPassword: '',
   });
   const [profilePic, setProfilePic] = useState(null);
-
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     // Check if passwords match for signup
     if (!isLogin && formData.password !== formData.confirmPassword) {
-      console.log("Passwords don't match");
+      toast.error('Passwords do not match!');
+      setLoading(false);
       return;
     }
 
     try {
       if (isLogin) {
-        await login({
+        // Login
+        const response = await login({
           email: formData.email,
           password: formData.password,
         });
 
+        // Check if login was successful
+        if (!response.success) {
+          toast.error(response.message || 'Invalid email or password');
+        }
       } else {
-        // Create form data for file upload
+        // Signup
         const signupData = new FormData();
         signupData.append('fullName', formData.fullName);
         signupData.append('email', formData.email);
@@ -42,11 +48,37 @@ const LoginPage = () => {
           signupData.append('profilePic', profilePic);
         }
 
-        await signup(signupData);
+        const response = await signup(signupData);
+
+        if (!response.success) {
+          toast.error(response.message || 'Registration failed');
+        }
       }
     } catch (error) {
-     
       console.log(error);
+
+      // Handle different error scenarios
+      if (error.response?.status === 401) {
+        toast.error('Invalid email or password. Please try again.');
+      } else if (error.response?.status === 404) {
+        toast.error('User not found. Please check your email or sign up.');
+      } else if (error.response?.status === 400) {
+        toast.error(
+          error.response?.data?.message ||
+            'Invalid input. Please check your details.'
+        );
+      } else if (error.response?.status === 409) {
+        toast.error('User already exists. Please login instead.');
+      } else if (error.code === 'ERR_NETWORK') {
+        toast.error('Network error. Please check your connection.');
+      } else {
+        toast.error(
+          error.response?.data?.message ||
+            'Something went wrong. Please try again.'
+        );
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -60,6 +92,18 @@ const LoginPage = () => {
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error('Image size should be less than 5MB');
+        return;
+      }
+
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        toast.error('Please select an image file');
+        return;
+      }
+
       setProfilePic(file);
       // Preview image
       const reader = new FileReader();
@@ -187,9 +231,16 @@ const LoginPage = () => {
           {/* Submit Button */}
           <button
             type='submit'
-            className='w-full py-3 rounded-xl bg-blue-500 hover:bg-blue-600 transition font-medium text-white'
+            disabled={loading}
+            className='w-full py-3 rounded-xl bg-blue-500 hover:bg-blue-600 transition font-medium text-white disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center'
           >
-            {isLogin ? 'Login' : 'Create Account'}
+            {loading ? (
+              <div className='w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin'></div>
+            ) : isLogin ? (
+              'Login'
+            ) : (
+              'Create Account'
+            )}
           </button>
         </form>
 
